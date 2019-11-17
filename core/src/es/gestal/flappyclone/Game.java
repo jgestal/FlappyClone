@@ -147,21 +147,27 @@ public class Game extends ApplicationAdapter implements BirdListener, TubeObstac
 	private void drawScreenText() {
 
 		switch (gameState) {
+
 			case TAP_TO_PLAY:
+
 				screenText.setText("TAP TO PLAY");
 				screenText.draw(batch);
+
 				break;
 
-
 			case PLAY:
+
 				scoreText.draw(batch);
+
 				break;
 
 			case GAME_OVER:
+
 				screenText.setText("GAME OVER");
 				screenText.draw(batch);
 
 				scoreText.draw(batch);
+
 				break;
 		}
 	}
@@ -183,13 +189,10 @@ public class Game extends ApplicationAdapter implements BirdListener, TubeObstac
 			Rectangle[] tubeRectangles = tube.collisionRectangles();
 			if (Intersector.overlaps(birdCircle, tubeRectangles[0]) || Intersector.overlaps(birdCircle, tubeRectangles[1])) {
 				die();
-				SoundManager.play(SFX.HIT);
 				return;
 			}
 		}
 	}
-
-
 
 	@Override
 	public void die() {

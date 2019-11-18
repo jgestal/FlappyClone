@@ -74,7 +74,7 @@ public class TubeObstacle implements GameElement, Drawable {
     @Override
     public void update() {
 
-        if (x + texture.getWidth() < Gdx.graphics.getWidth() / 2 && scoringTube % numberOfTubes == index) {
+        if (x + texture.getWidth() / 2 < Gdx.graphics.getWidth() / 2 && scoringTube % numberOfTubes == index) {
             listener.incScore();
             scoringTube += 1;
         }

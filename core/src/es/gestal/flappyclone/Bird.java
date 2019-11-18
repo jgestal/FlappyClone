@@ -64,7 +64,6 @@ public class Bird implements GameElement, Drawable {
             y = maxHeight;
         } else if (y <= minHeight) {
             listener.die();
-            SoundManager.play(SFX.HIT);
         }
 
         collisionCircle.set(x + sprites[0].getWidth() / 2,y + sprites[0].getHeight() / 2,sprites[0].getHeight() / 2);

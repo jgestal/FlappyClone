@@ -1,13 +1,13 @@
+package es.gestal.flappyclone;
+
 /**
  * The Flappy Clone is just a clone of the Flappy Bird
  * game and was created with GDX Lib.
  *
- * @author  Juan Gestal
+ * @author  Juan Gestalt
  * @version 1.0
  * @since   2019-11-16
  */
-
-package es.gestal.flappyclone;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;

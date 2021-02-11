@@ -11,23 +11,22 @@ package es.gestal.flappyclone;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Game extends ApplicationAdapter implements BirdListener, TubeObstacleListener {
+public class Game extends ApplicationAdapter implements TubeObstacleListener {
 
 	SpriteBatch batch;
-
 	GameState gameState;
 
 	int score;
 
 	Bird bird;
-
 	ParallaxBg[] backgrounds = new ParallaxBg[4];
-	TubeObstacle[] tubes = new TubeObstacle[TubeObstacle.numberOfTubes];
+	TubeObstacle[] tubes = new TubeObstacle[TubeObstacle.NUMBER_OF_TUBES];
 
 	ScreenText scoreText;
 	ScreenText screenText;
@@ -39,21 +38,26 @@ public class Game extends ApplicationAdapter implements BirdListener, TubeObstac
 
 		SoundManager.loadSFX();
 
-		bird = new Bird(this);
-
-		for (int i=0; i<ParallaxBg.backgroundFiles.length; i++) {
-			backgrounds[i] = new ParallaxBg(ParallaxBg.backgroundFiles[i],i*1.1f+.25f);
-		}
-
-		for (int i = 0; i<TubeObstacle.numberOfTubes; i++) {
-			tubes[i] = new TubeObstacle(this,i);
-		}
+		bird = new Bird();
+		createBackgrounds();
+		createTubeObstacles();
 
 		scoreText = new ScreenText(Gdx.graphics.getWidth() / 2,Gdx.graphics.getHeight() - 100);
 		screenText = new ScreenText(Gdx.graphics.getWidth() / 2, 300);
 
 		start();
+	}
 
+	private void createBackgrounds() {
+		for (int i=0; i<ParallaxBg.backgroundFiles.length; i++) {
+			backgrounds[i] = new ParallaxBg(ParallaxBg.backgroundFiles[i],i*1.1f+.25f);
+		}
+	}
+
+	private void createTubeObstacles() {
+		for (int i = 0; i<TubeObstacle.NUMBER_OF_TUBES; i++) {
+			tubes[i] = new TubeObstacle(this,i);
+		}
 	}
 
 	public void start() {
@@ -70,9 +74,14 @@ public class Game extends ApplicationAdapter implements BirdListener, TubeObstac
 	}
 
 	private void updateScore(int newScore) {
-
 		score = newScore;
 		scoreText.setText(Integer.toString(score));
+	}
+
+	@Override
+	public void render () {
+		update();
+		draw();
 	}
 
 	private void update() {
@@ -80,37 +89,59 @@ public class Game extends ApplicationAdapter implements BirdListener, TubeObstac
 		switch(gameState) {
 
 			case PLAY:
-
-				updateGameElements();
+				playUpdate();
 				break;
 
 			case TAP_TO_PLAY:
-
-				if (Gdx.input.justTouched()) {
-
-					gameState = GameState.PLAY;
-					bird.applyImpulse();
-					SoundManager.play(SFX.JUMP);
-				}
+				tapToPlayUpdate();
 				break;
 
 			case GAME_OVER:
-
-				if (Gdx.input.justTouched()) {
-					start();
-					gameState = GameState.TAP_TO_PLAY;
-				}
+				gameOverUpdate();
 				break;
-
 		}
 	}
 
-	private void updateGameElements() {
+	private void playUpdate() {
+		if (!isBirdCollidingWithTube() && !isBirdOutOfBounds()) {
+			readPlayerInput();
+			updateGameElements();
+		}
+		else {
+			gameOver();
+		}
+	}
 
+	private void readPlayerInput() {
 		if (Gdx.input.justTouched()) {
 			bird.applyImpulse();
 			SoundManager.play(SFX.JUMP);
 		}
+	}
+
+	private boolean isBirdCollidingWithTube() {
+		Circle birdCircle = bird.getCollisionCircle();
+		for (TubeObstacle tube : tubes) {
+			Rectangle[] tubeRectangles = tube.collisionRectangles();
+			if (Intersector.overlaps(birdCircle, tubeRectangles[0]) || Intersector.overlaps(birdCircle, tubeRectangles[1])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isBirdOutOfBounds() {
+
+		float birdHeight = bird.getHeight();
+		float birdY = bird.getY();
+
+		float maxHeight = Gdx.graphics.getHeight() - birdHeight;
+		float minHeight = 0;
+
+		return birdY > maxHeight || birdY <= minHeight;
+	}
+
+	private void updateGameElements() {
 
 		bird.update();
 
@@ -123,80 +154,61 @@ public class Game extends ApplicationAdapter implements BirdListener, TubeObstac
 		}
 	}
 
+	private void tapToPlayUpdate() {
+
+		if (Gdx.input.justTouched()) {
+			gameState = GameState.PLAY;
+			bird.applyImpulse();
+			SoundManager.play(SFX.JUMP);
+		}
+	}
+
+	private void gameOverUpdate() {
+
+		if (Gdx.input.justTouched()) {
+			start();
+			gameState = GameState.TAP_TO_PLAY;
+		}
+	}
+
 	private void draw() {
 
 		batch.begin();
 
+		drawBackgrounds(batch);
+		bird.draw(batch);
+		drawTubes(batch);
+		drawScreenText(batch);
+
+		//renderShapes();
+
+		batch.end();
+	}
+
+	private void drawBackgrounds(SpriteBatch batch) {
 		for (ParallaxBg background: backgrounds) {
 			background.draw(batch);
 		}
+	}
 
-		bird.draw(batch);
-
+	private void drawTubes(SpriteBatch batch) {
 		for (TubeObstacle tube : tubes) {
 			tube.draw(batch);
 		}
-
-		drawScreenText();
-
-		batch.end();
-
-		//renderShapes();
 	}
 
-	private void drawScreenText() {
-
-		switch (gameState) {
-
-			case TAP_TO_PLAY:
-
-				screenText.setText("TAP TO PLAY");
-				screenText.draw(batch);
-
-				break;
-
-			case PLAY:
-
-				scoreText.draw(batch);
-
-				break;
-
-			case GAME_OVER:
-
-				screenText.setText("GAME OVER");
-				screenText.draw(batch);
-
-				scoreText.draw(batch);
-
-				break;
-		}
-	}
-
-	@Override
-	public void render () {
+	private void drawScreenText(SpriteBatch batch) {
 
 		if (gameState == GameState.PLAY) {
-			checkCollisions();
+			scoreText.draw(batch);
 		}
-
-		update();
-		draw();
-	}
-
-	private void checkCollisions() {
-		Circle birdCircle = bird.getCollisionCircle();
-		for (TubeObstacle tube : tubes) {
-			Rectangle[] tubeRectangles = tube.collisionRectangles();
-			if (Intersector.overlaps(birdCircle, tubeRectangles[0]) || Intersector.overlaps(birdCircle, tubeRectangles[1])) {
-				die();
-				return;
-			}
+		else {
+			screenText.setText(gameState == GameState.TAP_TO_PLAY ? "TAP TO PLAY" : "GAME OVER");
+			screenText.draw(batch);
 		}
 	}
 
-	@Override
-	public void die() {
-
+	public void gameOver() {
 		gameState = GameState.GAME_OVER;
 		SoundManager.play(SFX.HIT);
 	}

@@ -30,14 +30,12 @@ public class ScreenText implements Drawable {
     }
 
     public void setText(String text) {
-
         glyphLayout.setText(font, text);
         this.text = text;
     }
 
     @Override
     public void draw(SpriteBatch batch) {
-
         font.draw(batch, text, x - glyphLayout.width / 2, y - glyphLayout.height / 2);
     }
 }

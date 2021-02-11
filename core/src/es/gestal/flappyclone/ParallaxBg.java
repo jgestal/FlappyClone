@@ -21,7 +21,6 @@ public class ParallaxBg implements GameElement, Drawable {
 
     @Override
     public void start() {
-
         x = 0;
     }
 

@@ -7,34 +7,24 @@ import com.badlogic.gdx.math.Circle;
 
 public class Bird implements GameElement, Drawable {
 
-    static final float impulse = -30;
-    static final float gravity = 2;
+    private static final float IMPULSE = -30;
+    private static final float GRAVITY = 2;
 
-    float y;
-    float x;
+    private float y;
+    private float x;
+    private float vy;
 
-    float vy;
+    private Texture[] sprites;
 
-    BirdListener listener;
-
-    Texture[] sprites;
-
-    Circle collisionCircle;
-
-    public Bird (BirdListener listener)  {
-
-        this.listener = listener;
-
+    public Bird ()  {
         sprites = new Texture[2];
         sprites[0] = new Texture("bird.png");
         sprites[1] = new Texture("bird2.png");
-
-        collisionCircle = new Circle();
     }
 
     public void applyImpulse() {
 
-        vy = Bird.impulse;
+        vy = Bird.IMPULSE;
     }
 
     @Override
@@ -53,24 +43,19 @@ public class Bird implements GameElement, Drawable {
 
     @Override
     public void update() {
-
-        vy = vy + gravity;
+        vy = vy + GRAVITY;
         y -= vy;
+    }
 
-        float maxHeight = Gdx.graphics.getHeight() - sprites[0].getHeight();
-        float minHeight = 0;
+    public float getHeight() {
+        return sprites[0].getHeight();
+    }
 
-        if (y > maxHeight) {
-            y = maxHeight;
-        } else if (y <= minHeight) {
-            listener.die();
-        }
-
-        collisionCircle.set(x + sprites[0].getWidth() / 2,y + sprites[0].getHeight() / 2,sprites[0].getHeight() / 2);
+    public float getY() {
+        return y;
     }
 
     public Circle getCollisionCircle() {
-
-        return collisionCircle;
+        return new Circle(x + sprites[0].getWidth() / 2,y + sprites[0].getHeight() / 2,sprites[0].getHeight() / 2);
     }
 }

@@ -11,58 +11,44 @@ import java.util.Random;
 
 public class TubeObstacle implements GameElement, Drawable {
 
-    static final float gap = 400;
-    static final float vx = 4;
-    static final float distanceBetween = 800;
-    static final int numberOfTubes = 4;
-    static final Random randomGenerator = new Random();
+    static final float GAP = 400;
+    static final float VX = 4;
+    static final float DISTANCE_BETWEEN = 800;
+    static final int NUMBER_OF_TUBES = 4;
+    static final Random randomRANDOM_GENERATOR = new Random();
 
     static int scoringTube = 0;
 
-    Texture texture;
+    private static Texture texture = new Texture("tube.png");
 
-    Sprite topTube;
-    Sprite bottomTube;
+    private static float MAX_OFFSET = (texture.getHeight() * 2 + GAP) - Gdx.graphics.getHeight();
 
-    static float maxOffset;
-    float offset;
+    private Sprite topTube = new Sprite(texture);
+    private Sprite bottomTube = new Sprite(texture);
 
-    float x;
+    private int index;
+    private float offset;
 
-    int index;
 
-    TubeObstacleListener listener;
-
-    Rectangle topTubeCollisionRectangle;
-    Rectangle bottomTubeCollisionRectangle;
+    private TubeObstacleListener listener;
 
     public TubeObstacle(TubeObstacleListener listener, int index) {
 
         this.listener = listener;
         this.index = index;
 
-        texture = new Texture("tube.png");
-
-        topTube = new Sprite(texture);
         topTube.setRotation(180);
-
-        bottomTube = new Sprite(texture);
-
-        maxOffset = (texture.getHeight() * 2 + gap) - Gdx.graphics.getHeight();
-
-        topTubeCollisionRectangle = new Rectangle();
-        bottomTubeCollisionRectangle = new Rectangle();
     }
 
     @Override
     public void start() {
         randomizeGap();
         scoringTube = 0;
-        setX(Gdx.graphics.getWidth() + index * distanceBetween);
+        setX(Gdx.graphics.getWidth() + index * DISTANCE_BETWEEN);
     }
 
     public void recycle() {
-        setX(x + numberOfTubes * distanceBetween);
+        setX(topTube.getX() + NUMBER_OF_TUBES * DISTANCE_BETWEEN);
     }
 
     @Override
@@ -74,39 +60,34 @@ public class TubeObstacle implements GameElement, Drawable {
     @Override
     public void update() {
 
-        if (x + texture.getWidth() / 2 < Gdx.graphics.getWidth() / 2 && scoringTube % numberOfTubes == index) {
+        if (topTube.getX() + texture.getWidth() / 2 < Gdx.graphics.getWidth() / 2 && scoringTube % NUMBER_OF_TUBES == index) {
             listener.incScore();
             scoringTube += 1;
         }
 
-        if (x + texture.getWidth() < 0) {
+        if (topTube.getX() + texture.getWidth() < 0) {
             recycle();
         }
 
-        setX(x - vx);
+        setX(topTube.getX() - VX);
     }
 
     public void randomizeGap() {
-        offset = randomGenerator.nextFloat() * maxOffset;
-        topTube.setY(texture.getHeight() + gap - offset);
+        offset = randomRANDOM_GENERATOR.nextFloat() * MAX_OFFSET;
+        topTube.setY(texture.getHeight() + GAP - offset);
         bottomTube.setY(-offset);
     }
 
-
-
     public void setX(float x) {
-        this.x = x;
         topTube.setX(x);
         bottomTube.setX(x);
     }
 
     public Rectangle[] collisionRectangles() {
 
-        Rectangle[] rectangles = new Rectangle[2];
-
-        rectangles[0] = topTubeCollisionRectangle.set(topTube.getX(), topTube.getY(), topTube.getWidth(), topTube.getHeight());
-        rectangles[1] = bottomTubeCollisionRectangle.set(bottomTube.getX(), bottomTube.getY(), bottomTube.getWidth(), bottomTube.getHeight());
-
-        return rectangles;
+        return new Rectangle[] {
+                new Rectangle(topTube.getX(), topTube.getY(), topTube.getWidth(), topTube.getHeight()),
+                new Rectangle(bottomTube.getX(), bottomTube.getY(), bottomTube.getWidth(), bottomTube.getHeight())
+        };
     }
 }

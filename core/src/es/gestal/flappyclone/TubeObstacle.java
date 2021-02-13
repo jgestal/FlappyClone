@@ -15,7 +15,7 @@ public class TubeObstacle implements GameElement, Drawable {
     static final float VX = 4;
     static final float DISTANCE_BETWEEN = 800;
     static final int NUMBER_OF_TUBES = 4;
-    static final Random randomRANDOM_GENERATOR = new Random();
+    static final Random RANDOM_GENERATOR = new Random();
 
     static int scoringTube = 0;
 
@@ -28,7 +28,6 @@ public class TubeObstacle implements GameElement, Drawable {
 
     private int index;
     private float offset;
-
 
     private TubeObstacleListener listener;
 
@@ -61,7 +60,7 @@ public class TubeObstacle implements GameElement, Drawable {
     public void update() {
 
         if (topTube.getX() + texture.getWidth() / 2 < Gdx.graphics.getWidth() / 2 && scoringTube % NUMBER_OF_TUBES == index) {
-            listener.incScore();
+            listener.tubePassesHalfScreen();
             scoringTube += 1;
         }
 
@@ -72,8 +71,8 @@ public class TubeObstacle implements GameElement, Drawable {
         setX(topTube.getX() - VX);
     }
 
-    public void randomizeGap() {
-        offset = randomRANDOM_GENERATOR.nextFloat() * MAX_OFFSET;
+    private void randomizeGap() {
+        offset = RANDOM_GENERATOR.nextFloat() * MAX_OFFSET;
         topTube.setY(texture.getHeight() + GAP - offset);
         bottomTube.setY(-offset);
     }

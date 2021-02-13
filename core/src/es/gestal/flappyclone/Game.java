@@ -214,10 +214,9 @@ public class Game extends ApplicationAdapter implements TubeObstacleListener {
 	}
 
 	@Override
-	public void incScore() {
-
+	public void tubePassesHalfScreen() {
 		SoundManager.play(SFX.SCORE);
-		updateScore(score+1);
+		updateScore(++score);
 	}
 
 	@Override

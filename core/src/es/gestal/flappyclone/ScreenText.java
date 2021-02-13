@@ -14,7 +14,6 @@ public class ScreenText implements Drawable {
     float x;
     float y;
 
-
     public ScreenText(float x, float y) {
 
         font = new BitmapFont();
